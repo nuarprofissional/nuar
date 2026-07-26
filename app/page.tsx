@@ -111,7 +111,7 @@ export default function Home() {
           <div className="hero-content">
             <p className="eyebrow">Tecnologia. Design. Resultados.</p>
             <div className="hero-icon-wrap" aria-hidden="true">
-              <img className="hero-icon" src="/icon.png" alt="" width={282} height={282} />
+              <img className="hero-icon" src="/hero-icon.png" alt="" width={448} height={304} />
             </div>
             <h1 id="hero-title">Transformamos negócios tradicionais em marcas digitais de <em>sucesso.</em></h1>
             <p className="hero-purpose">Ajudamos empresas a crescerem através de estratégia, design e tecnologia.</p>
