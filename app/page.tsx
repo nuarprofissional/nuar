@@ -52,7 +52,7 @@ const steps = [
 export default function Home() {
   const [openService, setOpenService] = useState<string | null>(null);
   const [filter, setFilter] = useState("Todos");
-  const [sent, setSent] = useState(false);
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -79,10 +79,25 @@ export default function Home() {
     [filter],
   );
 
-  function submitContact(event: FormEvent<HTMLFormElement>) {
+  async function submitContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSent(true);
-    event.currentTarget.reset();
+    const form = event.currentTarget;
+    setFormStatus("sending");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+
+      if (!response.ok) throw new Error("Falha no envio");
+
+      form.reset();
+      setFormStatus("success");
+    } catch {
+      setFormStatus("error");
+    }
   }
 
   return (
@@ -214,13 +229,17 @@ export default function Home() {
               <p>Ajudamos empresas locais a gerar mais clientes através de posicionamento digital e tecnologia.</p>
               <div className="contact-meta"><span>Projetos em todo o Brasil</span><span>Resposta em até 1 dia útil</span></div>
             </div>
-            <form className="contact-form" onSubmit={submitContact} data-reveal>
+            <form className="contact-form" onSubmit={submitContact} aria-busy={formStatus === "sending"} data-reveal>
               <label>Seu nome<input required name="name" placeholder="Como podemos te chamar?" /></label>
               <label>E-mail corporativo<input required type="email" name="email" placeholder="voce@empresa.com" /></label>
               <label>O que sua empresa precisa?<select required name="interest" defaultValue=""><option value="" disabled>Selecione uma frente</option><option>Estratégia e posicionamento</option><option>Identidade e branding</option><option>Site e tecnologia</option><option>Automação</option><option>Projeto integrado</option></select></label>
-              <label>Conte um pouco<textarea required name="message" rows={4} placeholder="Onde sua empresa está e onde quer chegar?" /></label>
-              <button className="button button-light submit" type="submit">Enviar projeto <span>↗</span></button>
-              <p className={`form-status ${sent ? "show" : ""}`} aria-live="polite">Recebido. Vamos conversar sobre o próximo passo.</p>
+              <label>Conte um pouco<textarea required minLength={10} maxLength={5000} name="message" rows={4} placeholder="Onde sua empresa está e onde quer chegar?" /></label>
+              <label className="form-honeypot" aria-hidden="true">Seu site<input name="website" tabIndex={-1} autoComplete="off" /></label>
+              <button className="button button-light submit" type="submit" disabled={formStatus === "sending"}>
+                {formStatus === "sending" ? "Enviando..." : "Enviar projeto"} <span>{formStatus === "sending" ? "…" : "↗"}</span>
+              </button>
+              <p className={`form-status ${formStatus === "success" ? "show" : ""}`} aria-live="polite">Recebido. Enviamos uma confirmação para o seu e-mail.</p>
+              <p className={`form-status error ${formStatus === "error" ? "show" : ""}`} aria-live="polite">Não foi possível enviar agora. Tente novamente em instantes.</p>
             </form>
           </div>
         </section>
