@@ -177,12 +177,12 @@ export default function Home() {
             <div className="section-heading compact" data-reveal>
               <div><p className="kicker">Trabalho que prova</p><h2>Cases em destaque.</h2></div>
               <div className="filters" role="group" aria-label="Filtrar cases por pilar">
-                {["Todos", "Estratégia", "Design", "Tecnologia"].map((item) => <button key={item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)} type="button">{item}</button>)}
+                {["Todos", "Estratégia", "Design", "Tecnologia"].map((item) => <button key={item} className={filter === item ? "active" : ""} aria-pressed={filter === item} onClick={() => setFilter(item)} type="button">{item}</button>)}
               </div>
             </div>
             <div className="case-grid">
               {visibleCases.map((item) => (
-                <article className={`case-card ${item.className}`} key={item.title} data-reveal>
+                <article className={`case-card ${item.className}`} key={item.title}>
                   <div className="case-top"><span>{item.tag}</span><span>{item.size}</span></div>
                   <div className="case-orbit" aria-hidden="true"><i /><b>{item.title.slice(0, 1)}</b></div>
                   <div className="case-copy"><p>{item.title}</p><strong>{item.result}</strong><small>{item.metric}</small></div>
